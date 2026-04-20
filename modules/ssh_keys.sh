@@ -86,7 +86,7 @@ _ssh_keys_add() {
     mkdir -p /root/.ssh
     chmod 700 /root/.ssh
 
-    echo -e "  ${INFO}Вставь публичный ключ (ssh-ed25519 / ssh-rsa) и нажми Enter, затем Ctrl+D:${NC}"
+    echo -e "  ${CYAN}Вставь публичный ключ (ssh-ed25519 / ssh-rsa) и нажми Enter, затем Ctrl+D:${NC}"
     echo
     local pub_key
     pub_key=$(cat)

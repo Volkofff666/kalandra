@@ -9,6 +9,8 @@ SSH_MONITOR="/etc/kalandra/ssh-monitor.sh"
 SSH_MONITOR_SERVICE="/etc/systemd/system/kalandra-ssh-monitor.service"
 LOAD_MONITOR_SERVICE="/etc/systemd/system/kalandra-load-monitor.service"
 LOAD_MONITOR="/etc/kalandra/load-monitor.sh"
+REBOOT_ALERT="/etc/kalandra/reboot-alert.sh"
+REBOOT_ALERT_SERVICE="/etc/systemd/system/kalandra-reboot-alert.service"
 
 run_telegram() {
     check_root
@@ -82,6 +84,7 @@ EOF
     step "Создаём SSH монитор"
     _create_ssh_monitor
     _create_load_monitor
+    _create_reboot_alert
     _install_services
 
     press_enter
@@ -100,6 +103,9 @@ _create_ssh_monitor() {
 #!/bin/bash
 source /etc/kalandra/telegram.conf
 
+server_ip=$(hostname -I 2>/dev/null | awk '{print $1}')
+[[ -z "$server_ip" ]] && server_ip=$(hostname)
+
 send_alert() {
     curl -s --max-time 5 \
         "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
@@ -109,17 +115,16 @@ send_alert() {
 
 declare -A fail_counts
 
-journalctl -u ssh -u sshd -f --no-pager 2>/dev/null | while read -r line; do
+journalctl -n 0 -u ssh -u sshd -u fail2ban -f --no-pager 2>/dev/null | while read -r line; do
     ts=$(date '+%Y-%m-%d %H:%M:%S')
     hostname=$(hostname)
-    ip=$(curl -s --max-time 2 https://api.ipify.org 2>/dev/null)
 
     # Успешный вход
     if echo "$line" | grep -q "Accepted"; then
         user=$(echo "$line" | grep -oP "for \K\S+")
         from_ip=$(echo "$line" | grep -oP "from \K[\d.]+")
         send_alert "🔐 [Kalandra] SSH подключение
-Сервер: ${hostname} (${ip})
+Сервер: ${hostname} (${server_ip})
 Пользователь: ${user}
 Откуда: ${from_ip}
 Время: ${ts}"
@@ -185,6 +190,27 @@ SCRIPT
     ok "Монитор нагрузки создан: ${LOAD_MONITOR}"
 }
 
+_create_reboot_alert() {
+    cat > "$REBOOT_ALERT" << 'SCRIPT'
+#!/bin/bash
+source /etc/kalandra/telegram.conf
+
+server_ip=$(hostname -I 2>/dev/null | awk '{print $1}')
+[[ -z "$server_ip" ]] && server_ip=$(hostname)
+
+curl -s --max-time 10 \
+    "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
+    -d "chat_id=${TELEGRAM_CHAT_ID}" \
+    -d "text=🔄 [Kalandra] Сервер перезагружен
+Hostname: $(hostname)
+IP: ${server_ip}
+Время: $(date '+%Y-%m-%d %H:%M:%S')" &>/dev/null
+SCRIPT
+
+    chmod +x "$REBOOT_ALERT"
+    ok "Скрипт reboot-алерта создан: ${REBOOT_ALERT}"
+}
+
 _install_services() {
     step "Устанавливаем systemd сервисы"
 
@@ -216,19 +242,25 @@ RestartSec=10
 WantedBy=multi-user.target
 EOF
 
+    cat > "$REBOOT_ALERT_SERVICE" << EOF
+[Unit]
+Description=Kalandra Reboot Alert
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=${REBOOT_ALERT}
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
     systemctl daemon-reload &>/dev/null
     systemctl enable --now kalandra-ssh-monitor &>/dev/null && ok "SSH монитор запущен" || warn "Ошибка запуска SSH монитора"
     systemctl enable --now kalandra-load-monitor &>/dev/null && ok "Монитор нагрузки запущен" || warn "Ошибка запуска монитора нагрузки"
-
-    # Алерт при перезагрузке через cron @reboot
-    local reboot_cron="/etc/cron.d/kalandra-reboot-alert"
-    local token chat_id
-    token=$(grep "^TELEGRAM_TOKEN=" "$TG_CONF" | cut -d= -f2-)
-    chat_id=$(grep "^TELEGRAM_CHAT_ID=" "$TG_CONF" | cut -d= -f2-)
-    cat > "$reboot_cron" << EOF
-@reboot root sleep 10 && curl -s "https://api.telegram.org/bot${token}/sendMessage" -d "chat_id=${chat_id}" -d "text=🔄 [Kalandra] Сервер перезагружен%0AHostname: \$(hostname)%0AВремя: \$(date '+%Y-%m-%d %H:%M:%S')"
-EOF
-    ok "Алерт при перезагрузке настроен"
+    rm -f /etc/cron.d/kalandra-reboot-alert 2>/dev/null
+    systemctl enable kalandra-reboot-alert &>/dev/null && ok "Алерт при перезагрузке настроен" || warn "Ошибка настройки reboot-алерта"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

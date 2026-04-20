@@ -157,7 +157,7 @@ full_hardening() {
     run_fail2ban
 
     step "Шаг 8/11 — Traffic Guard"
-    run_traffic_guard
+    run_traffic_guard_quick
 
     step "Шаг 9/11 — Port Knocking"
     confirm "Настроить Port Knocking?" && run_port_knock

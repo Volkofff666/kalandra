@@ -41,6 +41,14 @@ run_traffic_guard() {
     done
 }
 
+run_traffic_guard_quick() {
+    check_root
+
+    step "Traffic Guard"
+    _tg_install_if_needed || return 1
+    _tg_apply_both_core
+}
+
 _tg_install() {
     step "Установка traffic-guard"
 
@@ -50,13 +58,7 @@ _tg_install() {
         return
     fi
 
-    info "Загружаем и устанавливаем traffic-guard..."
-    if curl -fsSL https://raw.githubusercontent.com/dotX12/traffic-guard/master/install.sh | bash; then
-        ok "traffic-guard установлен"
-    else
-        err "Ошибка установки traffic-guard"
-        info "Проверь: https://github.com/dotX12/traffic-guard"
-    fi
+    _tg_install_if_needed
 
     press_enter
 }
@@ -65,16 +67,7 @@ _tg_apply_both() {
     step "Применяем оба списка (gov + antiscanner)"
     _tg_check_installed || return
 
-    info "Загружаем и применяем списки — это может занять минуту..."
-    if traffic-guard full \
-        -u "$TG_GOV" \
-        -u "$TG_SCAN" \
-        --enable-logging; then
-        ok "Оба списка применены"
-    else
-        err "Ошибка применения списков"
-    fi
-
+    _tg_apply_both_core
     _tg_status_brief
     press_enter
 }
@@ -166,6 +159,37 @@ _tg_check_installed() {
         press_enter
         return 1
     fi
+}
+
+_tg_install_if_needed() {
+    if command -v traffic-guard &>/dev/null; then
+        ok "traffic-guard уже установлен: $(traffic-guard --version 2>/dev/null || echo 'версия неизвестна')"
+        return 0
+    fi
+
+    info "Загружаем и устанавливаем traffic-guard..."
+    if curl -fsSL https://raw.githubusercontent.com/dotX12/traffic-guard/master/install.sh | bash; then
+        ok "traffic-guard установлен"
+        return 0
+    fi
+
+    err "Ошибка установки traffic-guard"
+    info "Проверь: https://github.com/dotX12/traffic-guard"
+    return 1
+}
+
+_tg_apply_both_core() {
+    info "Загружаем и применяем списки — это может занять минуту..."
+    if traffic-guard full \
+        -u "$TG_GOV" \
+        -u "$TG_SCAN" \
+        --enable-logging; then
+        ok "Оба списка применены"
+        return 0
+    fi
+
+    err "Ошибка применения списков"
+    return 1
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
