@@ -1,8 +1,8 @@
 #!/bin/bash
 # Установка и настройка Fail2ban
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-[[ -z "$GREEN" ]] && source "$SCRIPT_DIR/common.sh"
+MODULE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+[[ -z "$GREEN" ]] && source "$MODULE_DIR/common.sh"
 
 run_fail2ban() {
     check_root

@@ -6,15 +6,15 @@ if [[ -z "${BASH_VERSION:-}" ]]; then
     exit 1
 fi
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/modules/common.sh"
+KALANDRA_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$KALANDRA_DIR/modules/common.sh"
 
 check_root
 
 # Загрузка всех модулей
 for mod in ssh firewall icmp services sysctl fail2ban ssh_keys hostname ipv6 \
            traffic_guard port_knock telegram logs benchmark backup checklist; do
-    source "$SCRIPT_DIR/modules/${mod}.sh"
+    source "$KALANDRA_DIR/modules/${mod}.sh"
 done
 
 # ─── Дашборд ───────────────────────────────────────────────────────────────
@@ -182,7 +182,7 @@ run_menu_action() {
     local action="$1"
 
     if ! declare -F "$action" >/dev/null; then
-        err "Действие ${action} не загружено. Проверь установку модулей в $SCRIPT_DIR/modules"
+        err "Действие ${action} не загружено. Проверь установку модулей в $KALANDRA_DIR/modules"
         press_enter
         return 1
     fi

@@ -1,8 +1,8 @@
 #!/bin/bash
 # Бэкап конфигов
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-[[ -z "$GREEN" ]] && source "$SCRIPT_DIR/common.sh"
+MODULE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+[[ -z "$GREEN" ]] && source "$MODULE_DIR/common.sh"
 
 BACKUP_FILES=(
     /etc/ssh/sshd_config

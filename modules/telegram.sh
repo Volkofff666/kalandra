@@ -1,8 +1,8 @@
 #!/bin/bash
 # Telegram алерты
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-[[ -z "$GREEN" ]] && source "$SCRIPT_DIR/common.sh"
+MODULE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+[[ -z "$GREEN" ]] && source "$MODULE_DIR/common.sh"
 
 TG_CONF="/etc/kalandra/telegram.conf"
 SSH_MONITOR="/etc/kalandra/ssh-monitor.sh"

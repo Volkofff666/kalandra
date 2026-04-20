@@ -1,8 +1,8 @@
 #!/bin/bash
 # Firewall — настройка UFW
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-[[ -z "$GREEN" ]] && source "$SCRIPT_DIR/common.sh"
+MODULE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+[[ -z "$GREEN" ]] && source "$MODULE_DIR/common.sh"
 
 # Порты которые выдают VPN/прокси
 DANGEROUS_PORTS=(1194 500 4500 1080 3128 8118 8123 3389 51820)

@@ -1,8 +1,8 @@
 #!/bin/bash
 # Блокировка ICMP ping через UFW
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-[[ -z "$GREEN" ]] && source "$SCRIPT_DIR/common.sh"
+MODULE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+[[ -z "$GREEN" ]] && source "$MODULE_DIR/common.sh"
 
 run_icmp() {
     check_root

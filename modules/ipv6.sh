@@ -1,8 +1,8 @@
 #!/bin/bash
 # Отключение IPv6
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-[[ -z "$GREEN" ]] && source "$SCRIPT_DIR/common.sh"
+MODULE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+[[ -z "$GREEN" ]] && source "$MODULE_DIR/common.sh"
 
 SYSCTL_FILE="/etc/sysctl.d/99-kalandra.conf"
 

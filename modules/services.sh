@@ -1,8 +1,8 @@
 #!/bin/bash
 # Убрать детектируемые сервисы
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-[[ -z "$GREEN" ]] && source "$SCRIPT_DIR/common.sh"
+MODULE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+[[ -z "$GREEN" ]] && source "$MODULE_DIR/common.sh"
 
 # Сервисы которые выдают VPN/прокси сервер
 DETECT_SERVICES=(
