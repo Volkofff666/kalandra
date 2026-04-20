@@ -6,6 +6,7 @@ set -e
 INSTALL_DIR="/opt/kalandra"
 BIN_PATH="/usr/local/bin/kalandra"
 REPO="https://raw.githubusercontent.com/Volkofff666/kalandra/main"
+MODULES=(ssh firewall icmp services sysctl fail2ban ssh_keys hostname ipv6 traffic_guard port_knock telegram logs benchmark backup checklist)
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -56,13 +57,21 @@ info "Загружаем файлы..."
 curl -fsSL "$REPO/kalandra.sh" -o "$INSTALL_DIR/kalandra.sh" && ok "kalandra.sh"
 curl -fsSL "$REPO/modules/common.sh" -o "$INSTALL_DIR/modules/common.sh" && ok "modules/common.sh"
 
-for module in ssh firewall icmp services sysctl fail2ban ssh_keys hostname ipv6 \
-              traffic_guard port_knock telegram logs benchmark backup checklist; do
+failed=0
+
+for module in "${MODULES[@]}"; do
     curl -fsSL "$REPO/modules/${module}.sh" -o "$INSTALL_DIR/modules/${module}.sh" && \
-        ok "modules/${module}.sh" || err "Ошибка загрузки: modules/${module}.sh"
+        ok "modules/${module}.sh" || { err "Ошибка загрузки: modules/${module}.sh"; ((failed++)); }
 done
 
 curl -fsSL "$REPO/lists/custom.list" -o "$INSTALL_DIR/lists/custom.list" 2>/dev/null || true
+
+if (( failed > 0 )); then
+    echo
+    err "Установка прервана: не удалось загрузить ${failed} модулей."
+    err "Проверь что все файлы есть в репозитории: ${REPO}/modules/"
+    exit 1
+fi
 
 # Права
 chmod +x "$INSTALL_DIR/kalandra.sh"
@@ -79,4 +88,6 @@ echo
 ok "Kalandra установлена!"
 echo
 echo -e "  ${BOLD}Запуск:${NC}  ${CYAN}kalandra${NC}"
+echo -e "  ${BOLD}Версия:${NC} ${CYAN}kalandra version${NC}"
+echo -e "  ${BOLD}Обновления:${NC} ${CYAN}kalandra check-update${NC}"
 echo

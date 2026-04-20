@@ -6,6 +6,9 @@ if [[ -z "${BASH_VERSION:-}" ]]; then
     exit 1
 fi
 
+APP_VERSION="0.6.0"
+REPO_RAW_BASE="https://raw.githubusercontent.com/Volkofff666/kalandra/main"
+
 KALANDRA_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$KALANDRA_DIR/modules/common.sh"
 
@@ -16,6 +19,56 @@ for mod in ssh firewall icmp services sysctl fail2ban ssh_keys hostname ipv6 \
            traffic_guard port_knock telegram logs benchmark backup checklist; do
     source "$KALANDRA_DIR/modules/${mod}.sh"
 done
+
+print_version() {
+    echo "Kalandra ${APP_VERSION}"
+}
+
+version_is_newer() {
+    local left="$1" right="$2"
+    [[ "$(printf '%s\n%s\n' "$left" "$right" | sort -V | tail -1)" == "$left" && "$left" != "$right" ]]
+}
+
+check_updates() {
+    local remote_version
+    local remote_script="${REPO_RAW_BASE}/kalandra.sh"
+
+    step "Проверка обновлений"
+    info "Локальная версия: ${APP_VERSION}"
+
+    remote_version=$(curl -fsSL --max-time 10 "$remote_script" 2>/dev/null | grep -m1 '^APP_VERSION=' | cut -d'"' -f2)
+
+    if [[ -z "$remote_version" ]]; then
+        err "Не удалось получить удалённую версию."
+        info "Проверь доступ к GitHub: ${remote_script}"
+        return 1
+    fi
+
+    info "Удалённая версия: ${remote_version}"
+
+    if version_is_newer "$remote_version" "$APP_VERSION"; then
+        warn "Доступно обновление."
+        echo -e "  ${CYAN}Обновить:${NC} ${GRAY}curl -fsSL ${REPO_RAW_BASE}/install.sh | sudo bash${NC}"
+        return 0
+    fi
+
+    ok "У тебя уже актуальная версия."
+}
+
+handle_cli_args() {
+    case "${1:-}" in
+        version|--version|-v)
+            print_version
+            exit 0
+            ;;
+        check-update|--check-update|update-check)
+            check_updates
+            exit $?
+            ;;
+    esac
+}
+
+handle_cli_args "${1:-}"
 
 # ─── Дашборд ───────────────────────────────────────────────────────────────
 
@@ -86,6 +139,7 @@ show_dashboard() {
     echo -e "${BOLD}${WHITE}╔══════════════════ СТАТУС СЕРВЕРА ══════════════════╗${NC}"
     echo -e "${BOLD}${WHITE}║${NC}  🌐 IP адрес    : ${CYAN}${ext_ip}${NC}"
     echo -e "${BOLD}${WHITE}║${NC}  🖥  Hostname    : ${CYAN}$(hostname)${NC}"
+    echo -e "${BOLD}${WHITE}║${NC}  🧩 Версия      : ${CYAN}${APP_VERSION}${NC}"
     echo -e "${BOLD}${WHITE}║${NC}  🔑 SSH порт    : ${CYAN}${ssh_port}${NC}"
     echo -e "${BOLD}${WHITE}║${NC}  🔥 UFW         : $(echo -e "${ufw_status}")"
     echo -e "${BOLD}${WHITE}║${NC}  📡 ICMP ping   : $(echo -e "${icmp_status}")"
