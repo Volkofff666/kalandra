@@ -35,10 +35,10 @@ run_telegram() {
     echo
 
     echo -en "  ${YELLOW}?${NC} Bot Token: "
-    read -r bot_token
+    read_tty bot_token
 
     echo -en "  ${YELLOW}?${NC} Chat ID: "
-    read -r chat_id
+    read_tty chat_id
 
     if [[ -z "$bot_token" || -z "$chat_id" ]]; then
         err "Токен и Chat ID не могут быть пустыми"

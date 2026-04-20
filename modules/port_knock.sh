@@ -45,9 +45,9 @@ run_port_knock() {
 
     if ! confirm "Использовать эту последовательность?"; then
         info "Введи свои порты (1024-60000):"
-        echo -en "  Порт 1: "; read -r p1
-        echo -en "  Порт 2: "; read -r p2
-        echo -en "  Порт 3: "; read -r p3
+        echo -en "  Порт 1: "; read_tty p1
+        echo -en "  Порт 2: "; read_tty p2
+        echo -en "  Порт 3: "; read_tty p3
     fi
 
     step "Записываем /etc/knockd.conf"

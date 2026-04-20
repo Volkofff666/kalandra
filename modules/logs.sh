@@ -19,8 +19,7 @@ run_logs() {
         echo -e "${BOLD}${WHITE}║${NC}  ${GRAY}0.${NC}  Назад"
         echo -e "${BOLD}${WHITE}╚══════════════════════════════════════════╝${NC}"
         echo -en "  ${YELLOW}→${NC} Выбор: "
-        read -r choice
-        choice="$(normalize_input "$choice")"
+        read_tty choice
         choice="${choice//[[:space:]]/}"
 
         case "$choice" in

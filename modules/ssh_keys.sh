@@ -16,8 +16,7 @@ run_ssh_keys() {
         echo -e "${BOLD}${WHITE}║${NC}  ${GRAY}0.${NC}  Назад"
         echo -e "${BOLD}${WHITE}╚═══════════════════════════════════════════════╝${NC}"
         echo -en "  ${YELLOW}→${NC} Выбор: "
-        read -r choice
-        choice="$(normalize_input "$choice")"
+        read_tty choice
         choice="${choice//[[:space:]]/}"
 
         case "$choice" in
@@ -45,7 +44,7 @@ _ssh_keys_generate() {
     fi
 
     echo -en "  ${YELLOW}?${NC} Комментарий для ключа (Enter = root@$(hostname)): "
-    read -r key_comment
+    read_tty key_comment
     [[ -z "$key_comment" ]] && key_comment="root@$(hostname)"
 
     ssh-keygen -t ed25519 -C "$key_comment" -f "$key_path" -N "" &>/dev/null && \

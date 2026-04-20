@@ -25,7 +25,7 @@ run_ssh() {
     # Смена порта
     step "Смена SSH порта"
     echo -en "  ${YELLOW}?${NC} Новый SSH порт (Enter = оставить ${current_port}, рекомендуется 666): "
-    read -r new_port
+    read_tty new_port
 
     if [[ -z "$new_port" ]]; then
         new_port="$current_port"

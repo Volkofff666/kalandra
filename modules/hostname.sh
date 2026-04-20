@@ -21,7 +21,7 @@ run_hostname() {
 
     echo
     echo -en "  ${YELLOW}?${NC} Новый hostname (только буквы/цифры/дефис, без пробелов): "
-    read -r new_hostname
+    read_tty new_hostname
 
     if [[ -z "$new_hostname" ]]; then
         info "Отменено."

@@ -48,7 +48,7 @@ run_firewall() {
     step "Дополнительные порты"
     info "Введи дополнительные порты через запятую (например: 8443,2053) или Enter для пропуска"
     echo -en "  ${YELLOW}→${NC} Порты: "
-    read -r extra_ports
+    read_tty extra_ports
 
     if [[ -n "$extra_ports" ]]; then
         IFS=',' read -ra ports_arr <<< "$extra_ports"

@@ -22,14 +22,31 @@ normalize_input() {
     echo -n "$value"
 }
 
+read_tty() {
+    local __var_name="$1"
+    local __value=""
+
+    if [[ -r /dev/tty ]]; then
+        IFS= read -r __value < /dev/tty
+    else
+        IFS= read -r __value
+    fi
+
+    __value="$(normalize_input "$__value")"
+    printf -v "$__var_name" '%s' "$__value"
+}
+
 confirm() {
     local ans
     echo -en "  ${YELLOW}?${NC} $1 [y/N]: "
-    read -r ans
-    ans="$(normalize_input "$ans")"
+    read_tty ans
     [[ "$ans" =~ ^[Yy]$ ]]
 }
-press_enter() { echo -en "\n  ${GRAY}[Enter] продолжить...${NC}"; read -r; }
+press_enter() {
+    local _
+    echo -en "\n  ${GRAY}[Enter] продолжить...${NC}"
+    read_tty _
+}
 
 bar() {
     local pct=$1 width=20

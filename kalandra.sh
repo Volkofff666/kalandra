@@ -1,6 +1,11 @@
 #!/bin/bash
 # Kalandra by nocto — главный скрипт
 
+if [[ -z "${BASH_VERSION:-}" ]]; then
+    echo "Kalandra нужно запускать через bash, а не через sh."
+    exit 1
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/modules/common.sh"
 
@@ -195,8 +200,7 @@ main() {
         show_banner
         show_dashboard
         show_menu
-        read -r choice
-        choice="$(normalize_input "$choice")"
+        read_tty choice
         choice="${choice//[[:space:]]/}"
         echo
 
