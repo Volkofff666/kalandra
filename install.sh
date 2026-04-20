@@ -5,7 +5,7 @@ set -e
 
 INSTALL_DIR="/opt/kalandra"
 BIN_PATH="/usr/local/bin/kalandra"
-REPO="https://raw.githubusercontent.com/nocto-dev/kalandra/main"
+REPO="https://raw.githubusercontent.com/Volkofff666/kalandra/main"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
