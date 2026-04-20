@@ -16,7 +16,19 @@ err()         { echo -e "  ${RED}[✗]${NC} $1"; }
 info()        { echo -e "  ${CYAN}[i]${NC} $1"; }
 warn()        { echo -e "  ${YELLOW}[!]${NC} $1"; }
 step()        { echo -e "\n${BOLD}${WHITE}▶ $1${NC}"; }
-confirm()     { echo -en "  ${YELLOW}?${NC} $1 [y/N]: "; read -r ans; [[ "$ans" =~ ^[Yy]$ ]]; }
+normalize_input() {
+    local value="$1"
+    value="${value//$'\r'/}"
+    echo -n "$value"
+}
+
+confirm() {
+    local ans
+    echo -en "  ${YELLOW}?${NC} $1 [y/N]: "
+    read -r ans
+    ans="$(normalize_input "$ans")"
+    [[ "$ans" =~ ^[Yy]$ ]]
+}
 press_enter() { echo -en "\n  ${GRAY}[Enter] продолжить...${NC}"; read -r; }
 
 bar() {

@@ -17,6 +17,8 @@ run_ssh_keys() {
         echo -e "${BOLD}${WHITE}╚═══════════════════════════════════════════════╝${NC}"
         echo -en "  ${YELLOW}→${NC} Выбор: "
         read -r choice
+        choice="$(normalize_input "$choice")"
+        choice="${choice//[[:space:]]/}"
 
         case "$choice" in
             1) _ssh_keys_generate ;;

@@ -173,6 +173,20 @@ full_hardening() {
     press_enter
 }
 
+run_menu_action() {
+    local action="$1"
+
+    if ! declare -F "$action" >/dev/null; then
+        err "Действие ${action} не загружено. Проверь установку модулей в $SCRIPT_DIR/modules"
+        press_enter
+        return 1
+    fi
+
+    clear
+    show_banner
+    "$action"
+}
+
 # ─── Основной цикл ─────────────────────────────────────────────────────────
 
 main() {
@@ -182,26 +196,28 @@ main() {
         show_dashboard
         show_menu
         read -r choice
+        choice="$(normalize_input "$choice")"
+        choice="${choice//[[:space:]]/}"
         echo
 
         case "$choice" in
-            1)  clear; show_banner; run_ssh ;;
-            2)  clear; show_banner; run_firewall ;;
-            3)  clear; show_banner; run_icmp ;;
-            4)  clear; show_banner; run_services ;;
-            5)  clear; show_banner; run_sysctl ;;
-            6)  clear; show_banner; run_fail2ban ;;
-            7)  clear; show_banner; run_ssh_keys ;;
-            8)  clear; show_banner; run_hostname ;;
-            9)  clear; show_banner; run_ipv6 ;;
-            10) clear; show_banner; run_traffic_guard ;;
-            11) clear; show_banner; run_port_knock ;;
-            12) clear; show_banner; run_telegram ;;
-            13) clear; show_banner; run_logs ;;
-            14) clear; show_banner; run_benchmark ;;
-            15) clear; show_banner; run_backup ;;
+            1)  run_menu_action run_ssh ;;
+            2)  run_menu_action run_firewall ;;
+            3)  run_menu_action run_icmp ;;
+            4)  run_menu_action run_services ;;
+            5)  run_menu_action run_sysctl ;;
+            6)  run_menu_action run_fail2ban ;;
+            7)  run_menu_action run_ssh_keys ;;
+            8)  run_menu_action run_hostname ;;
+            9)  run_menu_action run_ipv6 ;;
+            10) run_menu_action run_traffic_guard ;;
+            11) run_menu_action run_port_knock ;;
+            12) run_menu_action run_telegram ;;
+            13) run_menu_action run_logs ;;
+            14) run_menu_action run_benchmark ;;
+            15) run_menu_action run_backup ;;
             16) full_hardening ;;
-            17) clear; show_banner; run_checklist ;;
+            17) run_menu_action run_checklist ;;
             0)
                 echo -e "  ${MAGENTA}Kalandra завершена. Your server has no reflection.${NC}\n"
                 exit 0
