@@ -37,7 +37,7 @@
 ## Установка
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/nocto-dev/kalandra/main/install.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/Volkofff666/kalandra/main/install.sh | sudo bash
 ```
 
 После установки:
