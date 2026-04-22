@@ -16,7 +16,8 @@ check_root
 
 # Загрузка всех модулей
 for mod in ssh firewall icmp services sysctl fail2ban ssh_keys hostname ipv6 \
-           traffic_guard port_knock telegram logs benchmark backup checklist; do
+           traffic_guard port_knock telegram logs benchmark backup checklist \
+           monitoring; do
     source "$KALANDRA_DIR/modules/${mod}.sh"
 done
 
@@ -174,9 +175,10 @@ show_menu() {
     echo -e "${BOLD}${WHITE}║${NC}  ${CYAN}13.${NC}  Просмотр логов"
     echo -e "${BOLD}${WHITE}║${NC}  ${CYAN}14.${NC}  Бенчмарк скорости"
     echo -e "${BOLD}${WHITE}║${NC}  ${CYAN}15.${NC}  Бэкап конфигов"
+    echo -e "${BOLD}${WHITE}║${NC}  ${CYAN}16.${NC}  📊 Grafana + Prometheus мониторинг"
     echo -e "${BOLD}${WHITE}║${NC}  ${GRAY}──────────────────────────────────────────${NC}"
-    echo -e "${BOLD}${WHITE}║${NC}  ${MAGENTA}16.${NC}  ${BOLD}★ Полный hardening (всё сразу)${NC}"
-    echo -e "${BOLD}${WHITE}║${NC}  ${CYAN}17.${NC}  Чеклист антидетекта"
+    echo -e "${BOLD}${WHITE}║${NC}  ${MAGENTA}17.${NC}  ${BOLD}★ Полный hardening (всё сразу)${NC}"
+    echo -e "${BOLD}${WHITE}║${NC}  ${CYAN}18.${NC}  Чеклист антидетекта"
     echo -e "${BOLD}${WHITE}║${NC}   ${GRAY}0.${NC}  Выход"
     echo -e "${BOLD}${WHITE}╚══════════════════════════════════════════════════════╝${NC}"
     echo -en "  ${YELLOW}→${NC} Выбор: "
@@ -274,14 +276,15 @@ main() {
             13) run_menu_action run_logs ;;
             14) run_menu_action run_benchmark ;;
             15) run_menu_action run_backup ;;
-            16) full_hardening ;;
-            17) run_menu_action run_checklist ;;
+            16) run_menu_action run_monitoring ;;
+            17) full_hardening ;;
+            18) run_menu_action run_checklist ;;
             0)
                 echo -e "  ${MAGENTA}Kalandra завершена. Your server has no reflection.${NC}\n"
                 exit 0
                 ;;
             *)
-                warn "Неверный выбор. Введи число от 0 до 17."
+                warn "Неверный выбор. Введи число от 0 до 18."
                 sleep 1
                 ;;
         esac
