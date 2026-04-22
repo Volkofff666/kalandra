@@ -6,7 +6,7 @@ set -e
 INSTALL_DIR="/opt/kalandra"
 BIN_PATH="/usr/local/bin/kalandra"
 REPO="https://raw.githubusercontent.com/Volkofff666/kalandra/main"
-MODULES=(ssh firewall icmp services sysctl fail2ban ssh_keys hostname ipv6 traffic_guard port_knock telegram logs benchmark backup checklist)
+MODULES=(ssh firewall icmp services sysctl fail2ban ssh_keys hostname ipv6 traffic_guard port_knock telegram logs benchmark backup checklist monitoring)
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
